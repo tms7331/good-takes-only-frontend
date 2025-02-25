@@ -1,42 +1,42 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
+import { Navbar } from "@/components/navbar"
 
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY
 
 async function getResponse(message: string) {
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${API_KEY}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: 'openai/gpt-4o',
+      model: "openai/gpt-4o",
       messages: [
         {
-          'role': 'system',
-          'content': "You are an assistant tasked with judging whether people's views of the cryptocurrency markets are good or not.  You will be given a message, and you will need to respond with whether the message is good or not.  You will also be given a description of the users's views, and you will need to use that to make your judgement. Return a one word response only, either 'good' or 'bad'."
+          role: "system",
+          content:
+            "You are an assistant tasked with judging whether people's views of the cryptocurrency markets are good or not.  You will be given a message, and you will need to respond with whether the message is good or not.  You will also be given a description of the users's views, and you will need to use that to make your judgement. Return a one word response only, either 'good' or 'bad'.",
         },
         {
-          role: 'user',
+          role: "user",
           content: message,
         },
       ],
     }),
-  });
+  })
 
-  const data = await response.json();
-  console.log(data);
-  return data.choices[0].message.content;
+  const data = await response.json()
+  console.log(data)
+  return data.choices[0].message.content
 }
-
 
 export default function Chat() {
   const [input, setInput] = useState("")
@@ -49,7 +49,7 @@ export default function Chat() {
     setIsSubmitted(true)
     setIsLoading(true)
     try {
-      const response = await getResponse(input);
+      const response = await getResponse(input)
       setResponse(response)
     } catch (error) {
       console.error("Error:", error)
@@ -60,55 +60,61 @@ export default function Chat() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <h1 className="text-4xl font-bold mb-8 text-blue-900 dark:text-blue-100 tracking-tight">Good Takes Only</h1>
+    <>
+      <Navbar />
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <h1 className="text-4xl font-bold mb-8 text-blue-900 dark:text-blue-100 tracking-tight">Good Takes Only</h1>
 
-      <Card className="w-full max-w-2xl border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-        <CardContent className="p-8">
-          <AnimatePresence mode="wait">
-            {!isSubmitted ? (
-              <motion.form
-                onSubmit={handleSubmit}
-                className="space-y-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Share your take</h2>
-                <Textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message here..."
-                  className="min-h-[200px] resize-none text-lg p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-900"
-                />
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white py-6 rounded-xl text-lg font-medium transition-all duration-200 shadow-md hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!input.trim()}
+        <Card className="w-full max-w-2xl border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+          <CardContent className="p-8">
+            <AnimatePresence mode="wait">
+              {!isSubmitted ? (
+                <motion.form
+                  onSubmit={handleSubmit}
+                  className="space-y-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  Send Message
-                </Button>
-              </motion.form>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="prose prose-lg dark:prose-invert max-w-none"
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
-                  </div>
-                ) : (
-                  <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-200 leading-relaxed">{response}</div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </CardContent>
-      </Card>
-    </div>
+                  <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Share your take</h2>
+                  <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your message here..."
+                    className="min-h-[200px] resize-none text-lg p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-900"
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white py-6 rounded-xl text-lg font-medium transition-all duration-200 shadow-md hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!input.trim()}
+                  >
+                    Send Message
+                  </Button>
+                </motion.form>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="prose prose-lg dark:prose-invert max-w-none"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-200 leading-relaxed">
+                      {response}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </CardContent>
+        </Card>
+      </div>
+    </>
   )
 }
+
