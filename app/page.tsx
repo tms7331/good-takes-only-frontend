@@ -21,6 +21,10 @@ async function getResponse(message: string) {
       model: 'openai/gpt-4o',
       messages: [
         {
+          'role': 'system',
+          'content': "You are an assistant tasked with judging whether people's views of the cryptocurrency markets are good or not.  You will be given a message, and you will need to respond with whether the message is good or not.  You will also be given a description of the users's views, and you will need to use that to make your judgement. Return a one word response only, either 'good' or 'bad'."
+        },
+        {
           role: 'user',
           content: message,
         },
