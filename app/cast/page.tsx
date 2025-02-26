@@ -36,7 +36,10 @@ async function publishCast(msg: string) {
     //     "success": true,
     //         "cast": {
     //         "hash": "0x608cc477dcc114ef8c331c51be0182da809af08e",
-    return data.cast.hash
+
+    const dataHash = data.cast.hash;
+    const truncatedHash = dataHash.slice(0, 10)
+    return truncatedHash
 }
 
 export default function CreateCast() {
@@ -62,8 +65,7 @@ export default function CreateCast() {
                 throw new Error("Invalid password");
             }
 
-            const response = await publishCast(input)
-            const truncatedHash = response.slice(0, 10)
+            const truncatedHash = await publishCast(input)
             const link = `https://warpcast.com/deepspeak/${truncatedHash}`
             setResponse(link)
             setIsLink(true)
