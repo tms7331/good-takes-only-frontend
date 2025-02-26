@@ -12,6 +12,7 @@ import webProofProver from "./WebProofProver.json";
 import webProofVerifier from "./WebProofVerifier.json";
 import { sepolia, anvil } from 'viem/chains'
 
+
 const VERIFIER_ADDRESS = "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707";
 const RPC_URL = "http://127.0.0.1:8545";
 
@@ -29,6 +30,18 @@ const publicClient = createPublicClient({
     chain: anvil,
     transport: http(RPC_URL),
 });
+/*
+
+// all args required by prover contract function except webProof itself
+const commitmentArgs = ['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045']
+
+const proverCallCommitment = {
+    address: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+    proverAbi: webProofProver.abi as Abi,
+    chainId: 31337,
+    functionName: 'main',
+    commitmentArgs: [] as never,
+};
 
 
 export async function getWebProof() {
@@ -44,29 +57,29 @@ export async function getWebProof() {
             expectUrl('http://localhost:3000', 'Submit a good take'),
             notarize('https://api.openai.com/v1/chat/completions', 'POST', 'Generate Proof of good take'),
         ],
+        proverCallCommitment: proverCallCommitment,
         // Don't actually use it but type system complains without it
-        proverCallCommitment: {
-            address: "0x0" as `0x${string}`,
-            proverAbi: webProofProver.abi as Abi,
-            chainId: 31337,
-            functionName: 'main',
-            commitmentArgs: [] as never,
-        },
     });
     return webProofRequest
 }
 
-export async function callProver(webProofRequest: WebProofRequestInput) {
-    const PROVER_ADDRESS = "0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6"
+export async function callProver(webProof) {
     const vlayer = createVlayerClient()
-    const hashedPass = "abckasdf023";
-    const hash = await vlayer.proveWeb({
-        address: PROVER_ADDRESS,
-        proverAbi: webProofProver.abi as Abi,
-        functionName: 'main',
-        args: [webProofRequest, hashedPass],
-        chainId: 31337,
+    const hash = await vlayer.prove({
+        ...proverCallCommitment,
+        args: [webProof, ...commitmentArgs],
     })
+
+    // const PROVER_ADDRESS = "0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6"
+    // const vlayer = createVlayerClient()
+    // const hashedPass = "abckasdf023";
+    // const hash = await vlayer.proveWeb({
+    //     address: PROVER_ADDRESS,
+    //     proverAbi: webProofProver.abi as Abi,
+    //     functionName: 'main',
+    //     args: [webProof, hashedPass],
+    //     chainId: 31337,
+    // })
     return hash
 }
 
@@ -91,6 +104,9 @@ export async function verifyProof(proof, hashedPass: string) {
     });
     console.log("Verified!", verification);
 };
+
+
+*/
 
 export async function checkApproved(hashedPass: string): Promise<boolean> {
     const approved = await publicClient.readContract({

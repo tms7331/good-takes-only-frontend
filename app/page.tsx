@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
-import { callProver, getWebProof, verifyProof } from "@/lib/prove"
+// import { callProver, getWebProof, verifyProof } from "@/lib/prove"
 import { hashString } from "@/lib/hashfunc"
-import { WebProofRequest } from '@vlayer/sdk'
+import { WebProofRequestInput } from '@vlayer/sdk'
 import { useState } from "react"
 
 
@@ -13,14 +13,20 @@ export default function Claim() {
   const [proofState, setProofState] = useState<'initial' | 'building' | 'proving' | 'ready' | 'verified'>('initial')
   const [proof, setProof] = useState<any>(null)
   const [password, setPassword] = useState('')
+  const handleClaim = async () => {
+  }
+  const handleVerify = async () => {
+  }
 
+  /*
   const handleClaim = async () => {
     try {
       setProofState('building')
-      const webProof = await getWebProof()
+      const webProofReq = await getWebProof()
+      const proof = { webProofJson: JSON.stringify({ presentationJson: webProofReq.presentationJson }) };
 
       setProofState('proving')
-      const generatedProof = await callProver(webProof)
+      const generatedProof = await callProver(proof);
       setProof(generatedProof)
       setProofState('ready')
     } catch (error) {
@@ -39,6 +45,7 @@ export default function Claim() {
       console.error("Error in verification:", error)
     }
   }
+    */
 
   return (
     <>
