@@ -1,4 +1,5 @@
 "use client"
+export const dynamic = "force-dynamic";
 
 import type React from "react"
 import { useState } from "react"
@@ -36,9 +37,12 @@ async function publishCast(msg: string) {
     //     "success": true,
     //         "cast": {
     //         "hash": "0x608cc477dcc114ef8c331c51be0182da809af08e",
+    if (!data.success || !data.cast || !data.cast.hash) {
+        console.error("Invalid API response:", data);
+        throw new Error("Cast failed or missing hash in response.");
+    }
 
-    const dataHash = data.cast.hash;
-    const truncatedHash = dataHash.slice(0, 10)
+    const truncatedHash = data.cast.hash.slice(0, 10)
     return truncatedHash
 }
 
