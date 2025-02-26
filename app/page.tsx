@@ -3,7 +3,8 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
-import { callProver, getWebProof, verifyProof, verifyProofFake } from "@/lib/prove"
+// import { callProver, getWebProof, verifyProof, verifyProofFake } from "@/lib/prove"
+import { verifyProofFake } from "@/lib/prove"
 import { hashString } from "@/lib/hashfunc"
 import { useState } from "react"
 
@@ -40,6 +41,7 @@ export default function Claim() {
     }
   }
 
+  /*
   const handleClaim = async () => {
     try {
       setProofState("building")
@@ -68,6 +70,7 @@ export default function Claim() {
       console.error("Error in verification:", error)
     }
   }
+    */
 
   return (
     <>
@@ -88,7 +91,7 @@ export default function Claim() {
           <CardContent className="p-6 space-y-4">
             {proofState === "initial" && (
               <Button
-                onClick={handleClaim}
+                onClick={handleClaimFake}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white py-8 text-xl font-medium transition-all duration-200 shadow-md hover:shadow-xl active:scale-95"
               >
                 Prove My Takes
@@ -109,7 +112,7 @@ export default function Claim() {
                   className="w-full p-4 border rounded-lg mb-4"
                 />
                 <Button
-                  onClick={handleVerify}
+                  onClick={handleVerifyFake}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white py-8 text-xl font-medium transition-all duration-200 shadow-md hover:shadow-xl active:scale-95"
                 >
                   Verify Proof and Claim Cast Privileges

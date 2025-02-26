@@ -14,9 +14,12 @@ import webProofProver from "./WebProofProver.json";
 import webProofVerifier from "./WebProofVerifier.json";
 import { sepolia, anvil } from 'viem/chains'
 
-const VERIFIER_ADDRESS = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512" as `0x${string}`;
-const PROVER_ADDRESS = "0x5fbdb2315678afecb367f032d93f642f64180aa3" as `0x${string}`;
+
+
+const VERIFIER_ADDRESS = process.env.VITE_VERIFIER_ADDRESS as `0x${string}`;
+const PROVER_ADDRESS = process.env.VITE_PROVER_ADDRESS as `0x${string}`;
 const RPC_URL = "http://127.0.0.1:8545";
+
 
 const walletClient = createWalletClient({
     chain: anvil,
@@ -30,6 +33,7 @@ const publicClient = createPublicClient({
 });
 
 
+/*
 
 const proverCallCommitment = {
     address: PROVER_ADDRESS,
@@ -106,6 +110,7 @@ export async function verifyProof(proof: any, hashedPass: string) {
     });
     console.log("Verified!", verification);
 };
+*/
 
 export async function verifyProofFake(hashedPass: string) {
     console.log("Getting verified...")
@@ -128,6 +133,7 @@ export async function verifyProofFake(hashedPass: string) {
     });
     console.log("Verified!", verification);
 };
+
 
 export async function checkApproved(hashedPass: string): Promise<boolean> {
     const approved = await publicClient.readContract({
