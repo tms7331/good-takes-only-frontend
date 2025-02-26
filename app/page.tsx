@@ -3,8 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
-// import { callProver, getWebProof, verifyProof, verifyProofFake } from "@/lib/prove"
-import { verifyProofFake } from "@/lib/prove"
+import { callProver, getWebProof, verifyProof, verifyProofFake } from "@/lib/prove"
 import { hashString } from "@/lib/hashfunc"
 import { useState } from "react"
 

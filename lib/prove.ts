@@ -33,8 +33,6 @@ const publicClient = createPublicClient({
 });
 
 
-/*
-
 const proverCallCommitment = {
     address: PROVER_ADDRESS,
     proverAbi: webProofProver.abi as Abi,
@@ -110,7 +108,7 @@ export async function verifyProof(proof: any, hashedPass: string) {
     });
     console.log("Verified!", verification);
 };
-*/
+
 
 export async function verifyProofFake(hashedPass: string) {
     console.log("Getting verified...")
