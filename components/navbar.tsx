@@ -12,12 +12,6 @@ export function Navbar() {
                     </div>
                     <div className="flex space-x-4">
                         <Link
-                            href="/submit"
-                            className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        >
-                            Submit Take
-                        </Link>
-                        <Link
                             href="/cast"
                             className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         >

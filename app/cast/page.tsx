@@ -7,22 +7,24 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
 import { Navbar } from "@/components/navbar"
+import { hashString } from "@/lib/hashfunc"
+import { checkApproved } from "@/lib/prove"
 
 async function publishCast(msg: string) {
-    const url = 'https://api.neynar.com/v2/farcaster/cast';
+    const url = "https://api.neynar.com/v2/farcaster/cast"
 
     const options = {
-        method: 'POST',
+        method: "POST",
         headers: {
-            accept: 'application/json',
-            'content-type': 'application/json',
-            'x-api-key': process.env.NEXT_PUBLIC_NEYNAR_KEY!
+            accept: "application/json",
+            "content-type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_NEYNAR_KEY!,
         },
         body: JSON.stringify({
             signer_uuid: process.env.NEXT_PUBLIC_NEYNAR_SIGNER_UUID,
             text: msg,
-        })
-    };
+        }),
+    }
     const response = await fetch(url, options)
     const data = await response.json()
     // If cast failed - return error
@@ -34,33 +36,40 @@ async function publishCast(msg: string) {
     //     "success": true,
     //         "cast": {
     //         "hash": "0x608cc477dcc114ef8c331c51be0182da809af08e",
-    return data.cast.hash;
+    return data.cast.hash
 }
-
 
 export default function CreateCast() {
     const [input, setInput] = useState("")
     const [response, setResponse] = useState("")
-    const [isLink, setIsLink] = useState(false);
+    const [isLink, setIsLink] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [password, setPassword] = useState("")
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+
         setIsSubmitted(true)
         setIsLoading(true)
         try {
+            const hash = await hashString(password)
+            console.log("hash", hash)
+            const approved = await checkApproved(hash)
+            console.log("approved", approved)
+            if (!approved) {
+                throw new Error("Invalid password");
+            }
+
             const response = await publishCast(input)
-            // This hash results in the following link:
-            // "0x608cc477dcc114ef8c331c51be0182da809af08e",
-            // https://warpcast.com/deepspeak/0x608cc477
-            const truncatedHash = response.slice(0, 10);
-            const link = `https://warpcast.com/deepspeak/${truncatedHash}`;
+            const truncatedHash = response.slice(0, 10)
+            const link = `https://warpcast.com/deepspeak/${truncatedHash}`
             setResponse(link)
             setIsLink(true)
         } catch (error) {
             console.error("Error:", error)
-            setResponse("Sorry, there was an error processing your request.")
+            setResponse(error instanceof Error ? error.message : "An unknown error occurred");
         } finally {
             setIsLoading(false)
         }
@@ -87,6 +96,15 @@ export default function CreateCast() {
                                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-2">
                                         What&apos;s your anonymous crypto take?
                                     </h2>
+                                    <div className="space-y-2">
+                                        <input
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="Enter password"
+                                            className="w-full text-base p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-900"
+                                        />
+                                    </div>
                                     <Textarea
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
