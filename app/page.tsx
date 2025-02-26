@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
-import { callProver, getWebProof, verifyProof } from "@/lib/prove"
+import { callProver, getWebProof, verifyProof, verifyProofFake } from "@/lib/prove"
 import { hashString } from "@/lib/hashfunc"
 import { useState } from "react"
 
@@ -12,6 +12,33 @@ export default function Claim() {
   const [proof, setProof] = useState<any>(null)
   const [password, setPassword] = useState("")
 
+  const handleClaimFake = async () => {
+    async function fakeCall() {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return 123
+    }
+    try {
+      setProofState("building")
+      const webProofReq = await fakeCall()
+      setProofState("proving")
+      const generatedProof = await fakeCall()
+      setProofState("ready")
+    } catch (error) {
+      console.error("Error in claim process:", error)
+      setProofState("initial")
+    }
+  }
+
+  const handleVerifyFake = async () => {
+    const hashedPass = await hashString(password)
+    console.log("Hashed password:", hashedPass)
+    try {
+      await verifyProofFake(hashedPass)
+      setProofState("verified")
+    } catch (error) {
+      console.error("Error in verification:", error)
+    }
+  }
 
   const handleClaim = async () => {
     try {
@@ -20,7 +47,9 @@ export default function Claim() {
       const proof = { webProofJson: JSON.stringify({ presentationJson: webProofReq.presentationJson }) }
 
       setProofState("proving")
-      const generatedProof = await callProver(proof)
+      // Using hashedPass in prover doesn't make sense...
+      const hashedPass = "0x123"
+      const generatedProof = await callProver(proof, hashedPass)
       setProof(generatedProof)
       setProofState("ready")
     } catch (error) {

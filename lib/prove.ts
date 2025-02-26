@@ -6,19 +6,17 @@ import {
     notarize,
     createExtensionWebProofProvider,
 } from '@vlayer/sdk/web_proof'
+import { createPublicClient, createWalletClient, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import { Hex, Abi } from "viem";
 
-// import { proverAbi } from './WebProofProver.json'
 import webProofProver from "./WebProofProver.json";
 import webProofVerifier from "./WebProofVerifier.json";
 import { sepolia, anvil } from 'viem/chains'
 
-
-const VERIFIER_ADDRESS = "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707";
+const VERIFIER_ADDRESS = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512" as `0x${string}`;
+const PROVER_ADDRESS = "0x5fbdb2315678afecb367f032d93f642f64180aa3" as `0x${string}`;
 const RPC_URL = "http://127.0.0.1:8545";
-
-import { createPublicClient, createWalletClient, http } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { Hex, Abi } from "viem";
 
 const walletClient = createWalletClient({
     chain: anvil,
@@ -30,13 +28,11 @@ const publicClient = createPublicClient({
     chain: anvil,
     transport: http(RPC_URL),
 });
-/*
 
-// all args required by prover contract function except webProof itself
-const commitmentArgs = ['0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045']
+
 
 const proverCallCommitment = {
-    address: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+    address: PROVER_ADDRESS,
     proverAbi: webProofProver.abi as Abi,
     chainId: 31337,
     functionName: 'main',
@@ -50,20 +46,26 @@ export async function getWebProof() {
         wsProxyUrl: "http://localhost:55688",
         notaryUrl: "http://127.0.0.1:7047"
     })
+
+    // startPage('http://localhost:3000', 'Go to Good Takes submission page'),
+    // expectUrl('http://localhost:3000', 'Submit a good take'),
+    // notarize('https://api.openai.com/v1/chat/completions', 'POST', 'Generate Proof of good take'),
     const webProofRequest = await provider.getWebProof({
         logoUrl: "http://twitterswap.com/logo.png",
         steps: [
-            startPage('http://localhost:3000', 'Go to Good Takes submission page'),
-            expectUrl('http://localhost:3000', 'Submit a good take'),
-            notarize('https://api.openai.com/v1/chat/completions', 'POST', 'Generate Proof of good take'),
+            startPage('https://good-takes-only-frontend.vercel.app/claim', 'Go to Good Takes submission page'),
+            expectUrl('https://good-takes-only-frontend.vercel.app/claim', 'Submit a good take'),
+            notarize('https://good-takes-only-frontend.vercel.app/api/chat', 'GET', 'Generate Proof of good take'),
         ],
-        proverCallCommitment: proverCallCommitment,
         // Don't actually use it but type system complains without it
+        proverCallCommitment: proverCallCommitment,
     });
     return webProofRequest
 }
 
-export async function callProver(webProof) {
+export async function callProver(webProof: any, hashedPass: string) {
+    // all args required by prover contract function except webProof itself
+    const commitmentArgs = [hashedPass]
     const vlayer = createVlayerClient()
     const hash = await vlayer.prove({
         ...proverCallCommitment,
@@ -83,7 +85,29 @@ export async function callProver(webProof) {
     return hash
 }
 
-export async function verifyProof(proof, hashedPass: string) {
+export async function verifyProof(proof: any, hashedPass: string) {
+    console.log("Getting verified...")
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    const txHash = await walletClient.writeContract({
+        address: VERIFIER_ADDRESS as `0x${string}`,
+        abi: webProofVerifier.abi as Abi,
+        functionName: "verify",
+        args: [proof, hashedPass],
+        chain: anvil,
+        // account: walletClient.account,
+    });
+    console.log("Tx hash:", txHash)
+
+    const verification = await publicClient.waitForTransactionReceipt({
+        hash: txHash,
+        confirmations: 1,
+        retryCount: 60,
+        retryDelay: 1000,
+    });
+    console.log("Verified!", verification);
+};
+
+export async function verifyProofFake(hashedPass: string) {
     console.log("Getting verified...")
     await new Promise(resolve => setTimeout(resolve, 2000));
     const txHash = await walletClient.writeContract({
@@ -104,9 +128,6 @@ export async function verifyProof(proof, hashedPass: string) {
     });
     console.log("Verified!", verification);
 };
-
-
-*/
 
 export async function checkApproved(hashedPass: string): Promise<boolean> {
     const approved = await publicClient.readContract({
