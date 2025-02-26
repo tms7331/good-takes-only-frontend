@@ -42,7 +42,8 @@ async function publishCast(msg: string) {
         throw new Error("Cast failed or missing hash in response.");
     }
 
-    const truncatedHash = data.cast.hash.slice(0, 10)
+    //const truncatedHash = data.cast.hash.slice(0, 10)
+    const truncatedHash = data.cast.hash;
     return truncatedHash
 }
 
