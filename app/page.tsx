@@ -40,36 +40,39 @@ export default function Claim() {
     }
   }
 
-  /*
+
   const handleClaim = async () => {
     try {
       setProofState("building")
       const webProofReq = await getWebProof()
       const proof = { webProofJson: JSON.stringify({ presentationJson: webProofReq.presentationJson }) }
 
+      console.log("BUILT PROOF!")
       setProofState("proving")
-      // Using hashedPass in prover doesn't make sense...
-      const hashedPass = "0x123"
-      const generatedProof = await callProver(proof, hashedPass)
+      const generatedProof = await callProver(proof)
       setProof(generatedProof)
       setProofState("ready")
+
+      // Instead of a separate verify function, we'll verify as soon as password is submitted
+      return generatedProof; // Return the proof for the new verifyWithProof function
     } catch (error) {
       console.error("Error in claim process:", error)
       setProofState("initial")
     }
   }
 
-  const handleVerify = async () => {
+  const verifyWithProof = async (proofData: any) => {
     const hashedPass = await hashString(password)
     console.log("Hashed password:", hashedPass)
+    console.log("Proof:", proofData)
     try {
-      await verifyProof(proof, hashedPass)
+      await verifyProof(proofData, hashedPass)
       setProofState("verified")
     } catch (error) {
       console.error("Error in verification:", error)
     }
   }
-    */
+
 
   return (
     <>
@@ -90,7 +93,7 @@ export default function Claim() {
           <CardContent className="p-6 space-y-4">
             {proofState === "initial" && (
               <Button
-                onClick={handleClaimFake}
+                onClick={handleClaim}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white py-8 text-xl font-medium transition-all duration-200 shadow-md hover:shadow-xl active:scale-95"
               >
                 Prove My Takes
@@ -111,7 +114,7 @@ export default function Claim() {
                   className="w-full p-4 border rounded-lg mb-4"
                 />
                 <Button
-                  onClick={handleVerifyFake}
+                  onClick={() => proof && verifyWithProof(proof)}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white py-8 text-xl font-medium transition-all duration-200 shadow-md hover:shadow-xl active:scale-95"
                 >
                   Verify Proof and Claim Cast Privileges

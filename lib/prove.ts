@@ -15,9 +15,8 @@ import webProofVerifier from "./WebProofVerifier.json";
 import { sepolia, anvil } from 'viem/chains'
 
 
-
-const VERIFIER_ADDRESS = process.env.VITE_VERIFIER_ADDRESS as `0x${string}`;
-const PROVER_ADDRESS = process.env.VITE_PROVER_ADDRESS as `0x${string}`;
+const VERIFIER_ADDRESS = process.env.NEXT_PUBLIC_VITE_VERIFIER_ADDRESS as `0x${string}`;
+const PROVER_ADDRESS = process.env.NEXT_PUBLIC_VITE_PROVER_ADDRESS as `0x${string}`;
 const RPC_URL = "http://127.0.0.1:8545";
 
 
@@ -32,7 +31,6 @@ const publicClient = createPublicClient({
     transport: http(RPC_URL),
 });
 
-
 const proverCallCommitment = {
     address: PROVER_ADDRESS,
     proverAbi: webProofProver.abi as Abi,
@@ -40,7 +38,6 @@ const proverCallCommitment = {
     functionName: 'main',
     commitmentArgs: [] as never,
 };
-
 
 export async function getWebProof() {
 
@@ -65,14 +62,21 @@ export async function getWebProof() {
     return webProofRequest
 }
 
-export async function callProver(webProof: any, hashedPass: string) {
+export async function callProver(webProof: any) {
+    console.log("CALLING PROVER!")
     // all args required by prover contract function except webProof itself
-    const commitmentArgs = [hashedPass]
     const vlayer = createVlayerClient()
+    console.log(PROVER_ADDRESS)
     const hash = await vlayer.prove({
-        ...proverCallCommitment,
-        args: [webProof, ...commitmentArgs],
+        address: PROVER_ADDRESS,
+        proverAbi: webProofProver.abi as Abi,
+        chainId: 31337,
+        functionName: 'main',
+        args: [webProof],
     })
+
+    const result = await vlayer.waitForProvingResult({ hash });
+    return result;
 
     // const PROVER_ADDRESS = "0x2279b7a0a67db372996a5fab50d91eaa73d2ebe6"
     // const vlayer = createVlayerClient()
@@ -84,17 +88,18 @@ export async function callProver(webProof: any, hashedPass: string) {
     //     args: [webProof, hashedPass],
     //     chainId: 31337,
     // })
-    return hash
+    // return hash
 }
 
 export async function verifyProof(proof: any, hashedPass: string) {
     console.log("Getting verified...")
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log("Proof:", proof)
+    console.log(VERIFIER_ADDRESS)
     const txHash = await walletClient.writeContract({
         address: VERIFIER_ADDRESS as `0x${string}`,
         abi: webProofVerifier.abi as Abi,
         functionName: "verify",
-        args: [proof, hashedPass],
+        args: [...proof, hashedPass],
         chain: anvil,
         // account: walletClient.account,
     });
@@ -117,7 +122,7 @@ export async function verifyProofFake(hashedPass: string) {
         address: VERIFIER_ADDRESS as `0x${string}`,
         abi: webProofVerifier.abi as Abi,
         functionName: "verifyT",
-        args: ["good", hashedPass],
+        args: [hashedPass],
         chain: anvil,
         // account: walletClient.account,
     });

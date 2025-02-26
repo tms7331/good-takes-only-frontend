@@ -19,6 +19,7 @@ async function getResponseGet(message: string) {
         },
     });
     const data = await response.json();
+    console.log("data", data)
     return data.response;
 }
 
