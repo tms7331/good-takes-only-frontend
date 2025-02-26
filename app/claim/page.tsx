@@ -9,7 +9,20 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Navbar } from "@/components/navbar"
 
 
-async function getResponse(message: string) {
+
+async function getResponseGet(message: string) {
+    const encodedMessage = encodeURIComponent(message);
+    const response = await fetch(`/api/chat?message=${encodedMessage}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    const data = await response.json();
+    return data.response;
+}
+
+async function getResponsePost(message: string) {
     const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -20,6 +33,7 @@ async function getResponse(message: string) {
     const data = await response.json();
     return data.response;
 }
+
 
 export default function Chat() {
     const [input, setInput] = useState("")
@@ -32,7 +46,7 @@ export default function Chat() {
         setIsSubmitted(true)
         setIsLoading(true)
         try {
-            const response = await getResponse(input)
+            const response = await getResponseGet(input)
             setResponse(response)
         } catch (error) {
             console.error("Error:", error)
